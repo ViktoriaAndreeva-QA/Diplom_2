@@ -1,0 +1,21 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+*.pyc
+__pycache__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
