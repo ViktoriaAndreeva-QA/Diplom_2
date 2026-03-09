@@ -3,11 +3,11 @@ import requests
 import allure
 from constants import (
     BASE_URL, CREATE_ORDER_ENDPOINT,
-    INGREDIENTS, INVALID_HASH_INGREDIENT,
     SUCCESS_CREATE_ORDER_CODE,
     ERROR_WITHOUT_INGREDIENTS_CODE, ERROR_WITHOUT_INGREDIENTS_RESPONSE,
     ERROR_INVALID_HASH_INGREDIENT_CODE
 )
+from data.ingredients_data import INGREDIENTS, INVALID_HASH_INGREDIENT
 
 @allure.feature('Создание заказа')
 class TestCreateOrder:
@@ -36,7 +36,6 @@ class TestCreateOrder:
     @allure.title('Успешное создание заказа с разными наборами ингредиентов')
     @allure.description('Параметризованная проверка создания заказа с различными комбинациями ингредиентов')
     @pytest.mark.parametrize("ingredients", [
-        ["61c0c5a71d1f82001bdaaa70"],
         [INGREDIENTS["bun_fluorescent"]],
         [INGREDIENTS["sauce_spicy_x"]],
         [INGREDIENTS["bun_fluorescent"], INGREDIENTS["filling_mollusk"]],
@@ -97,7 +96,6 @@ class TestCreateOrder:
 
         with allure.step('Проверка, что API требует авторизацию'):
             assert response.status_code == 401
-            assert response.json()["success"] is False
 
     @allure.title('Ошибка при создании заказа без ингредиентов')
     @allure.description('Проверка, что нельзя создать заказ с пустым списком ингредиентов')

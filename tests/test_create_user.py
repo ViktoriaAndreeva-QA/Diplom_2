@@ -7,7 +7,7 @@ from constants import (
     ERROR_MISSING_FIELDS_CODE, ERROR_MISSING_FIELDS_RESPONSE,
     ERROR_CONFLICT_CODE, ERROR_CONFLICT_RESPONSE
     )
-from conftest import generate_random_string
+from helpers import generate_random_string, generate_random_user_data
 
 
 @allure.feature('Создание пользователя')
@@ -17,9 +17,12 @@ class TestCreateUser:
 
     @allure.title('Успешное создание пользователя')
     @allure.description('Проверка создания пользователя со всеми обязательными полями')
-    def test_create_user_with_all_fields_success(self, random_user_data, delete_user_after_test):
+    def test_create_user_with_all_fields_success(self, delete_user_after_test):
         """Успешное создание пользователя с заполнением всех полей"""
-        response = requests.post(f"{BASE_URL}{REGISTER_ENDPOINT}", json=random_user_data)
+        user_data = generate_random_user_data()
+
+        with allure.step('Отправка POST запроса на регистрацию пользователя'):
+            response = requests.post(f"{BASE_URL}{REGISTER_ENDPOINT}", json=user_data)
 
         with allure.step('Получение токена и сохранение для удаления'):
             token = response.json().get("accessToken")
@@ -34,7 +37,8 @@ class TestCreateUser:
     @allure.description('Проверка, что нельзя создать пользователя с уже зарегистрированными данными')
     def test_create_user_already_exists_user_raises_error(self, created_user):
         """Ошибка при попытке создать уже существующего пользователя"""
-        response = requests.post(f"{BASE_URL}{REGISTER_ENDPOINT}", json=created_user["data"])
+        with allure.step('Отправка POST запроса на регистрацию существующего пользователя'):
+            response = requests.post(f"{BASE_URL}{REGISTER_ENDPOINT}", json=created_user["data"])
     
         with allure.step('Проверка ошибки 403 Conflict'):
             assert response.status_code == ERROR_CONFLICT_CODE
@@ -55,7 +59,7 @@ class TestCreateUser:
 
         del user_data[missing_field]
 
-        with allure.step(f'Отправка запроса без поля {missing_field}'):
+        with allure.step(f'Отправка POST запроса на регистрацию без поля {missing_field}'):
             response = requests.post(f"{BASE_URL}{REGISTER_ENDPOINT}", json=user_data)
 
         with allure.step('Проверка ошибки 400 Bad Request'):
